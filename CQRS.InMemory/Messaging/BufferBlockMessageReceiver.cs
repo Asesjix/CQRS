@@ -1,7 +1,6 @@
 ﻿using CQRS.Messaging;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace CQRS.InMemory.Messaging
 {
@@ -17,27 +16,17 @@ namespace CQRS.InMemory.Messaging
         
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        public void Start()
+        public async void Start()
         {
             if (_cancellationTokenSource == null)
             {
                 _cancellationTokenSource = new CancellationTokenSource();
-                Task.Factory.StartNew(() => ReceiveMessage(_cancellationTokenSource.Token));
-            }
-        }
-        /*
-        private async Task ReceiveMessages(CancellationToken cancellationToken)
-        {
-            await ReceiveMessageAsync(cancellationToken);
-        }
-        */
-        private void ReceiveMessage(CancellationToken cancellationToken)
-        {
-            if (cancellationToken.IsCancellationRequested == false)
-            {
-                var message = _messageBus.Receive();
-                Task.Factory.StartNew(() => ReceiveMessage(cancellationToken));
-                MessageReceived(this, new MessageReceivedEventArgs(message));
+
+                while (_cancellationTokenSource.Token.IsCancellationRequested == false)
+                {
+                    var message = await _messageBus.ReceiveAsync();
+                    MessageReceived(this, new MessageReceivedEventArgs(message));
+                }
             }
         }
 

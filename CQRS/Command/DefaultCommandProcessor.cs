@@ -15,17 +15,17 @@ namespace CQRS.Command
 
         public void Start()
         {
-            _messageReceiver.MessageReceived += OnMessageReceived;
+            _messageReceiver.MessageReceived += OnMessageReceivedAsync;
             _messageReceiver.Start();
         }
 
         public void Stop()
         {
             _messageReceiver.Stop();
-            _messageReceiver.MessageReceived -= OnMessageReceived;
+            _messageReceiver.MessageReceived -= OnMessageReceivedAsync;
         }
 
-        private async void OnMessageReceived(object sender, MessageReceivedEventArgs args)
+        private async void OnMessageReceivedAsync(object sender, MessageReceivedEventArgs args)
         {
             var c = (ICommand)args.Message.Payload;
             await _commandDispatcher.DispatchAsync(c);

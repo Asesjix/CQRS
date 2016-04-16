@@ -19,17 +19,17 @@ namespace CQRS.Event
 
         public void Start()
         {
-            _messageReceiver.MessageReceived += OnMessageReceived;
+            _messageReceiver.MessageReceived += OnMessageReceivedAsync;
             _messageReceiver.Start();
         }
 
         public void Stop()
         {
             _messageReceiver.Stop();
-            _messageReceiver.MessageReceived -= OnMessageReceived;
+            _messageReceiver.MessageReceived -= OnMessageReceivedAsync;
         }
 
-        private async void OnMessageReceived(object sender, MessageReceivedEventArgs args)
+        private async void OnMessageReceivedAsync(object sender, MessageReceivedEventArgs args)
         {
             _messageReceiverInstrumentation.MessageReceived();
 
