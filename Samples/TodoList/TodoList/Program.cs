@@ -108,7 +108,7 @@ namespace TodoList
 
         public async Task WorkAsync()
         {
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 1000000; i++)
             {
                 var todoItemId = Guid.NewGuid();
                 await _commandBus.SendAsync(new CreateTodoItem(todoItemId, string.Format("My Todo #{0}", i + 1)));
