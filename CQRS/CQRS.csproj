@@ -71,7 +71,6 @@
     <Compile Include="Messaging\IMessageSender.cs" />
     <Compile Include="Messaging\Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Threading\IOCompletionPortTaskScheduler.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
