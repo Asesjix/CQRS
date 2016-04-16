@@ -60,6 +60,9 @@
     <Compile Include="Event\IEventHandlerRegistry.cs" />
     <Compile Include="Event\IEventProcessor.cs" />
     <Compile Include="Handling\HandlerRegistry.cs" />
+    <Compile Include="Instrumentation\Messaging\DefaultMessageReceiverInstrumentation.cs" />
+    <Compile Include="Instrumentation\Messaging\IMessageSenderInstrumentation.cs" />
+    <Compile Include="Instrumentation\Messaging\IMessageReceiverInstrumentation.cs" />
     <Compile Include="IProcessor.cs" />
     <Compile Include="Messaging\MessageReceivedEventArgs.cs" />
     <Compile Include="Messaging\IMessage.cs" />
@@ -68,6 +71,7 @@
     <Compile Include="Messaging\IMessageSender.cs" />
     <Compile Include="Messaging\Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Threading\IOCompletionPortTaskScheduler.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -18,12 +18,14 @@ namespace TodoList.Handler
 
         public async Task HandleAsync(CreateTodoItem c)
         {
+            await Task.Delay(50);
             var todoItem = new TodoItem(c.TodoItemId, c.Description);
             await _todoItemRepository.SaveAsync(todoItem, c.Id);
         }
 
         public async Task HandleAsync(CompleteTodoItem c)
         {
+            await Task.Delay(50);
             var todoItem = await _todoItemRepository.GetAsync(c.TodoItemId);
             todoItem.Complete();
             await _todoItemRepository.SaveAsync(todoItem, c.Id);

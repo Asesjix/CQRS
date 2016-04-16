@@ -11,12 +11,14 @@ namespace TodoList.Handler
     {
         public async Task HandleAsync(TodoItemCreated e)
         {
+            await Task.Delay(25);
             Console.WriteLine("TodoItem {0} mit Beschreibung \"{1}\" wurde erstellt.", e.SourceId, e.Description);
             await Task.Delay(0);
         }
 
         public async Task HandleAsync(TodoItemCompleted e)
         {
+            await Task.Delay(25);
             Console.WriteLine("TodoItem {0} wurde erledigt.", e.SourceId);
             await Task.Delay(0);
         }

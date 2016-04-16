@@ -1,4 +1,5 @@
 ﻿using CQRS.Messaging;
+using CQRS.Threading;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,20 +23,34 @@ namespace CQRS.InMemory.Messaging
             if (_cancellationTokenSource == null)
             {
                 _cancellationTokenSource = new CancellationTokenSource();
-                
-                Task.Factory.StartNew(async () =>
+
+                var scheduler = new IOCompletionPortTaskScheduler(16, 8);
+                //var factory = new TaskFactory(scheduler);
+                var factory = Task.Factory;
+                factory.StartNew(() =>
                 {
-                    await ReceiveMessagesAsync(_cancellationTokenSource.Token);
+                    ReceiveMessage(_cancellationTokenSource.Token);
                 }, TaskCreationOptions.LongRunning);
             }
         }
-
-        private async Task ReceiveMessagesAsync(CancellationToken cancellationToken)
+        /*
+        private async Task ReceiveMessages(CancellationToken cancellationToken)
         {
-            while (_cancellationTokenSource.Token.IsCancellationRequested == false)
+            await ReceiveMessageAsync(cancellationToken);
+        }
+        */
+        private void ReceiveMessage(CancellationToken cancellationToken)
+        {
+            var message = _messageBus.Receive();
+            Task.Factory.StartNew(() => ReceiveNextMessage(cancellationToken));
+            MessageReceived(this, new MessageReceivedEventArgs(message));
+        }
+
+        private void ReceiveNextMessage(CancellationToken cancellationToken)
+        {
+            if (cancellationToken.IsCancellationRequested == false)
             {
-                var message = await _messageBus.ReceiveAsync();
-                MessageReceived(this, new MessageReceivedEventArgs(message));
+                Task.Factory.StartNew(() => ReceiveMessage(cancellationToken));
             }
         }
 

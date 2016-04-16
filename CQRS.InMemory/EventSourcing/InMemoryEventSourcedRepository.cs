@@ -1,6 +1,7 @@
 ﻿using CQRS.Event;
 using CQRS.EventSourcing;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,12 +10,12 @@ namespace CQRS.InMemory.EventSourcing
     public class InMemoryEventSourcedRepository<TEventSourced> : IEventSourcedRepository<TEventSourced>
         where TEventSourced : IEventSourced
     {
-        private readonly Dictionary<Guid, TEventSourced> _store;
+        private readonly ConcurrentDictionary<Guid, TEventSourced> _store;
         private readonly IEventBus _eventBus;
 
         public InMemoryEventSourcedRepository(IEventBus eventBus)
         {
-            _store = new Dictionary<Guid, TEventSourced>();
+            _store = new ConcurrentDictionary<Guid, TEventSourced>();
             _eventBus = eventBus;
         }
 
@@ -37,16 +38,8 @@ namespace CQRS.InMemory.EventSourcing
 
         public async Task SaveAsync(TEventSourced eventSourced, Guid correlationId)
         {
-            var eventSourcedStored = default(TEventSourced);
-            if (_store.TryGetValue(eventSourced.Id, out eventSourcedStored))
-            {
-                eventSourcedStored = eventSourced;
-            }
-            else
-            {
-                _store.Add(eventSourced.Id, eventSourced);
-            }
-            
+            _store.AddOrUpdate(eventSourced.Id, eventSourced, (id, storedValue) => eventSourced);
+
             foreach (var e in eventSourced.Events)
             {
                 await _eventBus.PublishAsync(e);

@@ -3,6 +3,7 @@ using CQRS.Event;
 using CQRS.EventSourcing;
 using CQRS.InMemory.EventSourcing;
 using CQRS.InMemory.Messaging;
+using CQRS.Instrumentation.Messaging;
 using CQRS.Messaging;
 using Microsoft.Practices.Unity;
 using System;
@@ -25,12 +26,14 @@ namespace TodoList
 
             var todoListAgent = new TodoListAgent(container);
             var workTask = todoListAgent.WorkAsync();
-            Task.WaitAll(workTask, Task.Delay(TimeSpan.FromMinutes(1)));
+
+            Console.WriteLine("Pres any key for Stop...");
+            Console.ReadKey();
 
             commandProcessor.Stop();
             eventProcessor.Stop();
-
-            Console.WriteLine("Done...");
+            
+            Console.WriteLine("Pres any key for Close...");
             Console.ReadKey();
         }
 
@@ -58,7 +61,9 @@ namespace TodoList
             var eventBus = new DefaultEventBus(eventMessageSender);
             container.RegisterInstance<IEventBus>(eventBus);
 
-            var eventProcessor = new DefaultEventProcessor(eventMessageReceiver, eventDispatcher);
+            var messageReceiverInstrumentation = new DefaultMessageReceiverInstrumentation("Events", true);
+            container.RegisterInstance<IMessageReceiverInstrumentation>("EventMessageReceiverInstrumentation", messageReceiverInstrumentation);
+            var eventProcessor = new DefaultEventProcessor(eventMessageReceiver, messageReceiverInstrumentation, eventDispatcher);
             container.RegisterInstance<IEventProcessor>(eventProcessor);
 
             /// Register EventSourcing
@@ -103,7 +108,7 @@ namespace TodoList
 
         public async Task WorkAsync()
         {
-            for (int i = 0; i < 1000000; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 var todoItemId = Guid.NewGuid();
                 await _commandBus.SendAsync(new CreateTodoItem(todoItemId, string.Format("My Todo #{0}", i + 1)));

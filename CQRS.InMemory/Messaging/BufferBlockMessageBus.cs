@@ -13,6 +13,11 @@ namespace CQRS.InMemory.Messaging
             _bufferBlock = new BufferBlock<IMessage>();
         }
 
+        public IMessage Receive()
+        {
+            return _bufferBlock.Receive();
+        }
+
         public async Task<IMessage> ReceiveAsync()
         {
             return await _bufferBlock.ReceiveAsync();
